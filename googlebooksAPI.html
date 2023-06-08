@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- firebaseui -->
+        <!-- <script src="bower_components/firebaseui/dist/firebaseui.js"></script> -->
+        <!-- <link type="text/css" rel="stylesheet" href="bower_components/firebaseui/dist/firebaseui.css" /> -->
+    <!-- firebase-app -->
+    <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
+
+    <title>Document</title>
+</head>
+<body>
+
+    <img src="" alt="">
+    
+    <h1>GOOGLE BOOKS API</h1>
+    <p>本の名前</p>
+    <input input name="" id="keyword" width="30" height="20"></input>
+    <button id="send">タイトルで検索</button>
+    <p>本の著者</p>
+    <input input name="" id="keyh" width="30" height="20"></input>
+    <button id="sendh">著者で検索</button>
+   
+    <section id="output">
+    </section>
+    <!-- <div id="viewerCanvas" style="width: 600px; height: 500px"></div> -->
+
+    <div>
+        <div>==============</div>
+        <div id="lib">""     </div>
+        <button id="lib_btn">検索</button>
+        <button id="lib2_btn">蔵書検索</button>
+
+    </div>
+
+</body>
+<!-- jquery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<!-- axios -->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<!-- googlebooksAPI -->
+<script type="text/javascript" src="https://www.google.com/books/jsapi.js"></script>
+
+<!-- firebase -->
+<script type="module">
+    // 必要なFirebaseライブラリを読み込み
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+
+    import {
+            getFirestore,
+            collection,
+            addDoc,
+            serverTimestamp,
+            doc, 
+            setDoc,
+            getDoc, 
+            query,
+            orderBy, 
+            onSnapshot
+        }from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+    import {
+        getAuth,
+        signInWithEmailAndPassword,
+        signInWithPopup,
+        GoogleAuthProvider,
+        signOut,
+        onAuthStateChanged }
+        from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+
+    // Firebase configuration KEYを取得して設定
+    const firebaseConfig = {
+        apiKey: "AIzaSyAQoEKFxrOMca-0FHiyYJrv98WBoFwwWSo",
+
+        authDomain: "api-work1.firebaseapp.com",
+        projectId: "api-work1",
+        storageBucket: "api-work1.appspot.com",
+        messagingSenderId: "624449799032",
+        appId: "1:624449799032:web:7772911d6af65d29343e8d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+// =============================================
+    //GoogleAuth認証用、ユーザーの認証情報を取得
+    const provider = new GoogleAuthProvider();
+    provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
+    const auth = getAuth();
+
+// -------------------------------------------------
+    function redirectToIndexPage() {
+        // エラーが発生した場合はindex.htmlにページ遷移する
+        window.location.href = "login.html";
+    }
+
+// =============================================
+// GoogleBooksAPI
+// =============================================
+// 記述がされたら、テキストエリアに書かれたことをvalで取得
+// 検索したいキーワードがurlのintitle以降に入る
+// タイトル
+let word = "";
+$("#keyword").on('input', function () {
+    word = $("#keyword").val();
+    console.log(word);
+});
+// 著者
+let h = "";
+$("#keyh").on('input', function () {
+    h = $("#keyh").val();
+    console.log(h);
+});
+// -----------------------------------
+// タイトルでの検索
+// -----------------------------------
+// ボタンを押したら、テキストエリアに書かれたことをvalで取得
+// APIにリクエストを送信している
+$("#send").on('click',function(){
+const url = `https://www.googleapis.com/books/v1/volumes?q=intitle:${word}&maxResults=10`
+console.log(url);
+
+$("#output").html("");
+
+    axios.get(url)
+        .then(function (response) {
+            // リクエスト成功時の処理（responseに結果が入っている）
+            console.log(response.data.items[1].volumeInfo.title);
+            console.log(response.data.items[1].volumeInfo.authors);
+            console.log(response.data.items[1].volumeInfo.publishedDate);
+            console.log(response.data.items[1].volumeInfo.description);
+            console.log(response.data.items[1].volumeInfo.imageLinks.smallThumbnail);
+            console.log(response.data.items[1].volumeInfo.pageCount);
+
+            const array =[];
+            for(let i = 0; i<response.data.items.length; i++){
+
+            array.push(
+                `<img src="${response.data.items[i].volumeInfo.imageLinks.smallThumbnail}">
+                <p>題名＝＝＝${response.data.items[i].volumeInfo.title}</p>
+                    <p>${response.data.items[i].volumeInfo.authors}</p>
+
+                    <a href="${response.data.items[i].volumeInfo.infoLink}"><p>リンク</p>
+                </a>`);
+                $("#output").html(array);
+            };
+
+            console.log(array);
+
+        })
+        .catch(function (error) {
+            // リクエスト失敗時の処理（errorにエラー内容が入っている）
+            console.log(error);
+        })
+        .finally(function () {
+            // 成功失敗に関わらず必ず実行
+            console.log("done!");
+        });
+    });
+
+// -----------------------------------
+// 著者での検索
+// -----------------------------------
+$("#sendh").on('click', function () {
+    const url2 = `https://www.googleapis.com/books/v1/volumes?q=inauthor:${h}&maxResults=10`
+    console.log(url2);
+
+      $("#output").html("");
+
+    axios.get(url2)
+        .then(function (response) {
+            // リクエスト成功時の処理（responseに結果が入っている）
+            console.log(response.data.items[1].volumeInfo.title);
+            console.log(response.data.items[1].volumeInfo.authors);
+            console.log(response.data.items[1].volumeInfo.publishedDate);
+            console.log(response.data.items[1].volumeInfo.description);
+            console.log(response.data.items[1].volumeInfo.imageLinks.smallThumbnail);
+            console.log(response.data.items[1].volumeInfo.pageCount);
+
+            const array2 = [];
+            for (let i = 0; i < response.data.items.length; i++) {
+
+                array2.push(
+                    `<img src="${response.data.items[i].volumeInfo.imageLinks.smallThumbnail}">
+                <p>題名＝＝＝${response.data.items[i].volumeInfo.title}</p>
+                    <p>${response.data.items[i].volumeInfo.authors}</p>
+
+                    <a href="${response.data.items[i].volumeInfo.infoLink}"><p>リンク</p>
+                </a>`);
+                $("#output").html(array2);
+            };
+
+            console.log(array2);
+
+        })
+        .catch(function (error) {
+            // リクエスト失敗時の処理（errorにエラー内容が入っている）
+            console.log(error);
+        })
+        .finally(function () {
+            // 成功失敗に関わらず必ず実行
+            console.log("done!");
+        });
+});
+
+</script>
+
+<script type="text/javascript">
+    google.books.load();
+
+    function initialize() {
+        var viewer = new google.books.DefaultViewer(document.getElementById('viewerCanvas'));
+        viewer.load('ISBN:0738531367');
+    }
+
+    google.books.setOnLoadCallback(initialize);
+</script>
+
+<!-- 図書館機能 -->
+<script>
+    'use strict';
+    // 検索をかける
+
+$("#lib_btn").on('click',function(){
+
+  const libUrl =
+        "https://api.calil.jp/library?appkey={da280c479ff3323463183ff2c51aa5f5}&pref=山口県&city=山口市&limit=10";
+
+    axios.get(libUrl)
+        .then(function (response) {
+            // リクエスト成功時の処理（responseに結果が入っている）
+            console.log(response);
+            console.log(response);
+            console.log(response);
+
+        })
+        .catch(function (error) {
+            // リクエスト失敗時の処理（errorにエラー内容が入っている）
+            console.log(error);
+        })
+        .finally(function () {
+            // 成功失敗に関わらず必ず実行
+            console.log("done!");
+        });
+
+});
+
+// 蔵書検索を行う
+$("#").on('click', function(){
+    const libUrl2 =
+        "https://api.calil.jp/check?appkey={da280c479ff3323463183ff2c51aa5f5}&isbn=4834000826&systemid=Aomori_Pref&format=json";
+
+});
+
+
+
+</script>
+
+
+
+</html>

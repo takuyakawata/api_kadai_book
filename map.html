@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAP</title>
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    
+        #map {
+            height: calc(100% - 102px);
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+
+<body>
+    <h1>MAP API</h1>
+    <div id="map"></div>
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://www.bing.com/api/maps/mapcontrol?mkt=ja-jp&key=AqcwE4abAtRFTiK8xl_Hcl35LxP0D8YT8NptLKATGrPItDqV-1yxYGNN8nXN-Tis"></script>
+
+<script>
+// マップ情報格納用の変数（APIによっては必要ないこともあるかも、bingmapは必要になる。
+let map;
+// 位置情報の取得に成功した場合に実行される関数 成功したとき
+function showPosition(position) {
+    console.log(position);
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+    console.log(lat, lng);
+};
+
+// 位置情報の取得を失敗したとき
+function showError(error) {
+    const errorMessages = [
+        "位置情報が許可されてません",
+        "現在位置を特定できません",
+        "位置情報を取得する前にタイムアウトになりました",
+    ];
+    alert(`error:${errorMessages[error.code - 1]}`);
+};
+
+const option = {
+    enableHighAccuracy: true,
+    maximumAge: 20000,
+    timeout: 1000000,
+};
+
+// この後マップ表示の処理を書き込む
+function mapsInit(position) {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+    map = new Microsoft.Maps.Map("#map", {
+        center: {
+            latitude: lat,
+            longitude: lng,
+        },
+        zoom: 15,
+    });
+};
+
+// 位置情報取得処理
+window.onload = function () {
+    navigator.geolocation.getCurrentPosition(mapsInit, showError, option);
+};
+</script>
+
+</html>

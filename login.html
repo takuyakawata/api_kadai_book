@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="index.css"> -->
+    <!-- Authentication -->
+
+    <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css">
+
+    <title>ログイン</title>
+</head>
+
+<body>
+    <main>
+        <div>
+            <h1>Welcome to App</h1>
+            <div id="firebaseui-auth-container"></div>
+        </div>
+             <p>email</p>
+             <input id="email" type="text" >
+             <p>password</p>
+             <input id= "password"  type="text" >
+            <button id="login">google login</button>
+    </main>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+<script type="module">
+// 必要なFirebaseライブラリを読み込み
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged }
+from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+
+// Firebase configuration KEYを取得して設定
+const firebaseConfig = {
+        apiKey: "AIzaSyAQoEKFxrOMca-0FHiyYJrv98WBoFwwWSo",
+
+        authDomain: "api-work1.firebaseapp.com",
+        projectId: "api-work1",
+        storageBucket: "api-work1.appspot.com",
+        messagingSenderId: "624449799032",
+        appId: "1:624449799032:web:7772911d6af65d29343e8d"
+};
+
+const app = initializeApp(firebaseConfig);
+
+//GoogleAuth認証用
+const provider = new GoogleAuthProvider();
+provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
+const auth = getAuth();
+
+
+// signInWithEmailAndPassword(auth, email, password)
+//         .then((userCredential) => {
+//             // Signed in
+//             const user = userCredential.user;
+//             console.log("ログイン成功です")
+//         })
+
+//         .catch((error) => {
+//             const errorCode = error.code;
+//             const errorMessage = error.message;
+//                console.log("ログインエラー")
+
+
+//ログイン処理//ログインボタンを押したとき、//Google認証完了後の処理//ログイン後のページ遷移をする
+$("#login").on("click", function () {
+
+    const email = $("#email").val();
+    const password = $("#password").val();
+    
+    signInWithPopup(auth, provider,password)
+    .then((result) => {
+        location.href = "googlebooksAPI.html";
+        // ページ遷移
+    })
+    .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        const email = error.email;
+        //認証タイプ
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        console.log("error")
+    });
+});
+</script>
+
+</body>
+</html>
