@@ -5,39 +5,80 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- firebaseui -->
-        <!-- <script src="bower_components/firebaseui/dist/firebaseui.js"></script> -->
-        <!-- <link type="text/css" rel="stylesheet" href="bower_components/firebaseui/dist/firebaseui.css" /> -->
-    <!-- firebase-app -->
+<link rel="stylesheet" href="/css/googlebooks.css">
+
     <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
 
     <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
 
-    <title>Document</title>
+    <title>本検索アプリ</title>
 </head>
 <body>
+    <main>
+        <h1>GOOGLE BOOKS</h1>
 
-    <img src="" alt="">
-    
-    <h1>GOOGLE BOOKS API</h1>
-    <p>本の名前</p>
-    <input input name="" id="keyword" width="30" height="20"></input>
-    <button id="send">タイトルで検索</button>
-    <p>本の著者</p>
-    <input input name="" id="keyh" width="30" height="20"></input>
-    <button id="sendh">著者で検索</button>
-   
-    <section id="output">
-    </section>
-    <!-- <div id="viewerCanvas" style="width: 600px; height: 500px"></div> -->
+        <div class="btns">
+            <div class="btn">
+            <p>本の名前を入力してね！</p>
+            <input input name="" id="keyword" width="30" height="20"></input>
+            <button id="send" class="search">タイトルで検索</button>
+            </div>
+        
+            <div class="btn">
+                <p>本の著者を入力してね！</p>
+                <input input id="keyh" width="30" height="20"></input>
+                <button id="sendh" class="search">著者で検索</button>
+            </div>
 
-    <div>
-        <div>==============</div>
-        <div id="lib">""     </div>
-        <button id="lib_btn">検索</button>
-        <button id="lib2_btn">蔵書検索</button>
+            <div class="btn">
+                <p>近くのと図書館にあるかな？</p>
+                <div id="lib">""     </div>
+                <button id="lib_btn" class="search">検索</button>
+                <button id="lib2_btn" class="search">蔵書検索</button>
+            </div>
+        </div>
+        
+        <!-- 検索結果が出る場所 -->
+        <h1>検索結果</h1>
+        <section class="result">
+            <div class="img">
+            <p>表紙</p>
+            </div>
+            <div class="title">
+                <p>題名</p>
+            </div>
+            <div class="author">
+                <p>著者</p>
+            </div>
+            <div class="link">
+                    <p>リンク</p>
+            </div>
+        </section>
+        
+        <section id="output">
 
-    </div>
+            <!-- <div >
+                <section class="result">
+                    <div class="img">
+                    <img src="${response.data.items[i].volumeInfo.imageLinks.smallThumbnail}">
+                    </div>
+                    <div class="title">
+                        <p>題名${response.data.items[i].volumeInfo.title}</p>
+                    </div>
+                    <div class="author">
+                        <p>${response.data.items[i].volumeInfo.authors}</p>
+                    </div>
+                    <div class="link">
+                        <a href="${response.data.items[i].volumeInfo.infoLink}">
+                        <p>詳細</p>
+                    </div>
+                    </section>
+            </div> -->
+
+            </section>
+            </a>
+        </div>
+    </main>
 
 </body>
 <!-- jquery -->
@@ -58,11 +99,11 @@
             collection,
             addDoc,
             serverTimestamp,
-            doc, 
+            doc,
             setDoc,
-            getDoc, 
+            getDoc,
             query,
-            orderBy, 
+            orderBy,
             onSnapshot
         }from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
@@ -142,12 +183,24 @@ $("#output").html("");
             for(let i = 0; i<response.data.items.length; i++){
 
             array.push(
-                `<img src="${response.data.items[i].volumeInfo.imageLinks.smallThumbnail}">
-                <p>題名＝＝＝${response.data.items[i].volumeInfo.title}</p>
-                    <p>${response.data.items[i].volumeInfo.authors}</p>
-
-                    <a href="${response.data.items[i].volumeInfo.infoLink}"><p>リンク</p>
-                </a>`);
+                `   <div >
+                <section class="result">
+                    <div class="img">
+                    <img src="${response.data.items[i].volumeInfo.imageLinks.smallThumbnail}">
+                    </div>
+                    <div class="title">
+                        <p>題名${response.data.items[i].volumeInfo.title}</p>
+                    </div>
+                    <div class="author">
+                        <p>${response.data.items[i].volumeInfo.authors}</p>
+                    </div>
+                    <div class="link">
+                        <a href="${response.data.items[i].volumeInfo.infoLink}">
+                        <p>詳細</p>
+                    </div>
+                    </section>
+                    
+            </div>`);
                 $("#output").html(array);
             };
 
@@ -187,12 +240,24 @@ $("#sendh").on('click', function () {
             for (let i = 0; i < response.data.items.length; i++) {
 
                 array2.push(
-                    `<img src="${response.data.items[i].volumeInfo.imageLinks.smallThumbnail}">
-                <p>題名＝＝＝${response.data.items[i].volumeInfo.title}</p>
-                    <p>${response.data.items[i].volumeInfo.authors}</p>
-
-                    <a href="${response.data.items[i].volumeInfo.infoLink}"><p>リンク</p>
-                </a>`);
+                     `   <div >
+                <section class="result">
+                    <div class="img">
+                    <img src="${response.data.items[i].volumeInfo.imageLinks.smallThumbnail}">
+                    </div>
+                    <div class="title">
+                        <p>題名${response.data.items[i].volumeInfo.title}</p>
+                    </div>
+                    <div class="author">
+                        <p>${response.data.items[i].volumeInfo.authors}</p>
+                    </div>
+                    <div class="link">
+                        <a href="${response.data.items[i].volumeInfo.infoLink}">
+                        <p>詳細</p>
+                    </div>
+                    </section>
+                    
+            </div>`);
                 $("#output").html(array2);
             };
 
